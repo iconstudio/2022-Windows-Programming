@@ -90,15 +90,9 @@ int main() {
 				for (it = inputs.begin(); it != end; ++it) {
 					const auto ch = (*it);
 
-					if (' ' != ch) {
-						temp_inserter = ch;
-						if ('e' == ch || 'E' == ch) {
-							check_e = true;
-						}
-					} else {
+					if (' ' == ch) {
 						// 출력
-						if (check_e)
-						{
+						if (check_e) {
 							transform(temp.begin(), temp.end()
 								, temp.begin(), toupper);
 						}
@@ -107,8 +101,20 @@ int main() {
 						result += ' ';
 						temp.clear();
 						check_e = false;
+					} else {
+						temp_inserter = ch;
+						if ('e' == ch || 'E' == ch) {
+							check_e = true;
+						}
 					}
 				}
+				if (check_e) {
+					transform(temp.begin(), temp.end()
+						, temp.begin(), toupper);
+				}
+				result += temp;
+				result += ' ';
+
 				inputs = move(result);
 
 				cout << "결과: " << inputs << '\n';

@@ -15,7 +15,7 @@ int main() {
 	array<int, 50> datas;
 	iota(datas.begin(), datas.end(), 1);
 
-	generate(datas.begin(), datas.end(), [&]() { return r_distribution(r_engine); });
+	shuffle(datas.begin(), datas.end(), r_engine);
 
 
 }

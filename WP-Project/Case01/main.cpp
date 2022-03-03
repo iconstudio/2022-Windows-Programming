@@ -19,13 +19,10 @@ public:
 		horizontal_iterator(Matrix* cont, size_t ind = 0)
 			: container(cont), index(ind) {}
 
-		horizontal_iterator(const horizontal_iterator& other)
-			: container(other.container)
-			, index(other.index)
-			, x(other.x), y(other.y) {}
+		horizontal_iterator(const horizontal_iterator& other) = default;
 
-		constexpr reference operator*() noexcept {
-			return const_cast<reference>(container->matrix[y][x]);
+		constexpr reference operator*() const noexcept {
+			return (container->matrix[y][x]);
 		}
 
 		constexpr pointer operator->() const noexcept {
@@ -123,9 +120,7 @@ public:
 		}
 	}
 
-	Matrix(const Matrix&& other)
-		: sz_w(other.sz_w), sz_h(other.sz_h), size(other.size)
-		, matrix(move(other.matrix)) {}
+	Matrix(const Matrix&& other) = default;
 
 	const inline horizontal_iterator begin() noexcept {
 		return horizontal_iterator(this, 0);

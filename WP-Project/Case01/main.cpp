@@ -9,156 +9,76 @@ using namespace std;
 
 class Matrix {
 public:
-	class horizontal_iterator {
-	public:
-		using iterator_category = random_access_iterator_tag;
-		using element_type = int;
-		using pointer = element_type*;
-		using reference = element_type&;
-
-		horizontal_iterator(Matrix* cont, size_t ind = 0)
-			: container(cont), index(ind) {}
-
-		horizontal_iterator(const horizontal_iterator& other)
-			: container(other.container)
-			, index(other.index)
-			, x(other.x), y(other.y) {}
-
-		constexpr reference operator*() noexcept {
-			return const_cast<reference>(container->matrix[y][x]);
-		}
-
-		constexpr pointer operator->() const noexcept {
-			return pointer_traits<pointer>::pointer_to(container->matrix[y][x]);
-		}
-
-		horizontal_iterator& operator++() noexcept {
-			index++;
-			Update();
-			return *this;
-		}
-
-		horizontal_iterator operator++(int) noexcept {
-			horizontal_iterator temp = *this;
-			index++;
-			Update();
-			return temp;
-		}
-
-		horizontal_iterator& operator--() noexcept {
-			index--;
-			Update();
-			return *this;
-		}
-
-		horizontal_iterator operator--(int) noexcept {
-			horizontal_iterator temp = *this;
-			index--;
-			Update();
-			return temp;
-		}
-
-		horizontal_iterator& operator+=(const size_t _Off) noexcept {
-			index += _Off;
-			Update();
-			return *this;
-		}
-
-		horizontal_iterator operator+(const size_t _Off) const noexcept {
-			horizontal_iterator temp = *this;
-			temp += _Off;
-			return temp;
-		}
-
-		horizontal_iterator& operator-=(const size_t _Off) noexcept {
-			index -= _Off;
-			Update();
-			return *this;
-		}
-
-		horizontal_iterator operator-(const size_t _Off) const noexcept {
-			horizontal_iterator temp = *this;
-			temp -= _Off;
-			return temp;
-		}
-
-		horizontal_iterator& operator+=(const horizontal_iterator& other) {
-			index += other.index;
-			Update();
-			return *this;
-		}
-
-		horizontal_iterator operator+(const horizontal_iterator& other) const {
-			horizontal_iterator temp = *this;
-			temp += other.index;
-			return temp;
-		}
-
-		horizontal_iterator& operator-=(const horizontal_iterator& other) {
-			horizontal_iterator temp = *this;
-			temp -= other.index;
-			return *this;
-		}
-
-		bool operator==(const horizontal_iterator& other) {
-			return (&container == &other.container && index == other.index);
-		}
-
-	private:
-		Matrix* container;
-		size_t index;
-		size_t x, y;
-
-		void Update() {
-			size_t x = static_cast<size_t>(index % container->sz_w);
-			size_t y = static_cast<size_t>(index / container->sz_w);
-		}
-	};
-
 	Matrix(const size_t w, const size_t h, const size_t value = 0)
-		: sz_w(w), sz_h(h), size(w* h), matrix(new int* [h]) {
+		: sz_w(w), sz_h(h), size(w* h)
+		, matrix(new int* [h]) {
 		for (int i = 0; i < h; ++i) {
 			matrix[i] = new int[w] {0};
 			//fill(&(matrix[i][0]), &(matrix[i][w]), value);
 		}
 	}
 
-	Matrix(const Matrix&& other)
-		: sz_w(other.sz_w), sz_h(other.sz_h), size(other.size)
-		, matrix(move(other.matrix)) {}
+	Matrix(const Matrix&& other) = default;
 
-	const inline horizontal_iterator begin() noexcept {
-		return horizontal_iterator(this, 0);
+	void Set(size_t x, size_t y, int value) {
+		auto& place = At(x, y);
+		place = value;
 	}
 
-	const inline horizontal_iterator end() noexcept {
-		return horizontal_iterator(this, size);
+	void Set(size_t index, int value) {
+		auto& place = At(index);
+		place = value;
 	}
-	bool operator==(Matrix& other) {
-		if (size == other.size && sz_w == other.sz_w && sz_h == other.sz_h) {
-			return false;
-		} else {
-			auto miss = search(begin(), end(), other.begin(), other.end());
-			if (miss == end()) {
-				return (size == other.size && sz_w == other.sz_w && sz_h == other.sz_h);
-			} else {
-				return false;
+
+	int& At(size_t x, size_t y) const {
+		return (matrix[y][x]);
+	}
+
+	int& At(size_t index) const {
+		size_t x = (index % sz_w);
+		size_t y = (index / sz_w);
+		return At(x, y);
+	}
+
+	template <typename Predicate>
+	void Foreach(Predicate predicate)
+	{
+		for (int j = 0; j < sz_h; ++j)
+		{
+			for (int i = 0; i < sz_w; ++i) {
+				auto& place = At(i, j);
+				predicate(place);
 			}
 		}
 	}
 
+	template <typename Predicate>
+	void ForeachH(const size_t y, Predicate predicate) {
+		for (int i = 0; i < sz_w; ++i) {
+			auto& place = At(i, y);
+			predicate(place);
+		}
+	}
+
+	template <typename Predicate>
+	void ForeachV(const size_t x, Predicate predicate) {
+		for (int j = 0; j < sz_h; ++j) {
+			auto& place = At(x, j);
+			predicate(place);
+		}
+	}
+
+	template <typename Predicate>
+	void PrintH(const size_t y) {
+		for (int i = 0; i < sz_w; ++i) {
+			auto& place = At(i, y);
+			cout << place << " ";
+		}
+		cout << '\n';
+	}
+
 	const size_t sz_w, sz_h, size;
 	int** matrix = nullptr;
-};
-
-template<>
-struct iterator_traits<Matrix::horizontal_iterator> {
-	using iterator_category = random_access_iterator_tag;
-	using element_type = int;
-	using value_type = int;
-	using pointer = element_type*;
-	using reference = element_type&;
-	using difference_type = size_t;
 };
 
 int main() {
@@ -167,14 +87,16 @@ int main() {
 	bool done = false;
 
 	random_device r_device;
-	uniform_int_distribution<> r_distribution(1, 50);
 	default_random_engine r_engine(r_device());
 
 	array<int, 50> numbers;
 	iota(numbers.begin(), numbers.end(), 1);
 	shuffle(numbers.begin(), numbers.end(), r_engine);
-	copy_n(numbers.begin(), matrix.size, matrix.begin());
-	//for_each(matrix.begin(), matrix.end(), [&](int& elem) { cout << elem << ", ";});
+
+	int index = 0;
+	for_each_n(numbers.begin(), matrix.size, [&](int number) {
+		matrix.Set(index++, number);
+	});
 	cout << endl;
 
 	cin.clear();
@@ -188,10 +110,58 @@ int main() {
 		command = toupper(command);
 
 		switch (command) {
-			case 'A':
+			case 'A': // 행을 따라 오름차순 정렬
+			{
+
+			}
+			break;
+
+			case 'D': // 열을 따라 내림차순 정렬
 			{
 			}
 			break;
+
+			case 'E': // 짝수
+			{
+			}
+			break;
+
+			case 'O': // 홀수
+			{
+			}
+			break;
+
+			case 'M': // 최대
+			{
+			}
+			break;
+
+			case 'N': // 최소
+			{
+			}
+			break;
+
+			case 'P': // 행의 값을 합해 1열에 저장
+			{
+			}
+			break;
+
+			case 'R': // 무작위 재정렬
+			{
+			}
+			break;
+
+			case 'S': // 다시 값 입력받기 시작
+			{
+			}
+			break;
+
+			case 'Q': // 종료
+			{
+				done = true;
+			}
+			break;
+
 		}
 	}
 }

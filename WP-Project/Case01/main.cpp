@@ -148,6 +148,25 @@ int main() {
 
 			case 'R': // 무작위 재정렬
 			{
+				auto& _UFirst = matrix.At(0);
+				auto& _ULast = matrix.At(matrix.size - 1);
+				auto& _UTarget = matrix.At(0);
+				size_t _Target_index = 1;
+
+				for (; ++_Target_index < matrix.size - 1; ++_Target_index) {
+					normal_distribution<int> r_distribution(0, _Target_index + 1);
+
+					size_t _Off = r_distribution(r_engine);
+					if (_Off < 0 || _Target_index < _Off) {
+						break;
+					}
+
+					if (_Off != _Target_index) { // avoid self-move-assignment
+						auto value = _UTarget;
+						matrix.Set(_Target_index, value);
+						matrix.Set(_Off, value);
+					}
+				}
 			}
 			break;
 

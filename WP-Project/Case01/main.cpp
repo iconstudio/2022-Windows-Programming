@@ -18,7 +18,7 @@ public:
 		}
 	}
 
-	Matrix(const Matrix&& other) = default;
+	Matrix(const Matrix& other) = default;
 
 	void Set(size_t x, size_t y, int value) {
 		auto& place = At(x, y);
@@ -154,14 +154,14 @@ int main() {
 				size_t _Target_index = 1;
 
 				for (; ++_Target_index < matrix.size - 1; ++_Target_index) {
-					normal_distribution<int> r_distribution(0, _Target_index + 1);
+					uniform_int_distribution<int> r_distribution(0, _Target_index + 1);
 
 					size_t _Off = r_distribution(r_engine);
 					if (_Off < 0 || _Target_index < _Off) {
 						break;
 					}
 
-					if (_Off != _Target_index) { // avoid self-move-assignment
+					if (_Off != _Target_index) {
 						auto value = _UTarget;
 						matrix.Set(_Target_index, value);
 						matrix.Set(_Off, value);

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <random>
 #include <array>
+#include <limits>
 #include <numeric>
 
 using namespace std;
@@ -10,15 +11,18 @@ using namespace std;
 class Matrix {
 public:
 	Matrix(const size_t w, const size_t h, const size_t value = 0)
-		: sz_w(w), sz_h(h), size(w* h)
-		, matrix(new int* [h]) {
-		for (int i = 0; i < h; ++i) {
-			matrix[i] = new int[w] {0};
+		: sz_w(w), sz_h(h), size(w * h)
+		, matrix(new int* [w]) {
+		for (int i = 0; i < w; ++i) {
+			matrix[i] = new int[h] {0};
 			//fill(&(matrix[i][0]), &(matrix[i][w]), value);
 		}
 	}
 
-	Matrix(const Matrix&& other) = default;
+	Matrix(const Matrix& other) = default;
+
+	size_t GetWidth() const { return sz_w; }
+	size_t GetHeight() const { return sz_w; }
 
 	void Set(size_t x, size_t y, int value) {
 		auto& place = At(x, y);
@@ -41,10 +45,8 @@ public:
 	}
 
 	template <typename Predicate>
-	void Foreach(Predicate predicate)
-	{
-		for (int j = 0; j < sz_h; ++j)
-		{
+	void Foreach(Predicate predicate) {
+		for (int j = 0; j < sz_h; ++j) {
 			for (int i = 0; i < sz_w; ++i) {
 				auto& place = At(i, j);
 				predicate(place);
@@ -68,11 +70,31 @@ public:
 		}
 	}
 
-	template <typename Predicate>
+	void Print() {
+		for (int i = 0; i < sz_h; ++i) {
+			PrintH(i);
+		}
+	}
+
 	void PrintH(const size_t y) {
 		for (int i = 0; i < sz_w; ++i) {
 			auto& place = At(i, y);
+			auto org = cout.width(2);
 			cout << place << " ";
+			cout.width(org);
+		}
+		cout << '\n';
+	}
+
+	template<typename Predicate>
+	void PrintH_If(const size_t y, Predicate predicate) {
+		for (int i = 0; i < sz_w; ++i) {
+			auto& place = At(i, y);
+			if (predicate(place)) {
+				auto org = cout.width(2);
+				cout << place << " ";
+				cout.width(org);
+			}
 		}
 		cout << '\n';
 	}
@@ -97,6 +119,8 @@ int main() {
 	for_each_n(numbers.begin(), matrix.size, [&](int number) {
 		matrix.Set(index++, number);
 	});
+
+	matrix.Print();
 	cout << endl;
 
 	cin.clear();
@@ -133,16 +157,46 @@ int main() {
 
 			case 'M': // 최대
 			{
+				auto max = numeric_limits<int>::min();
+				matrix.Foreach([&](int value) {
+					if (max < value) {
+						max = value;
+					}
+				});
+				cout << "최대값: " << max << '\n';
 			}
 			break;
 
 			case 'N': // 최소
 			{
+				int min = numeric_limits<int>::max();
+				matrix.Foreach([&](int value) {
+					if (value < min) {
+						min = value;
+					}
+				});
+				cout << "최소값: " << min << '\n';
 			}
 			break;
 
 			case 'P': // 행의 값을 합해 1열에 저장
 			{
+				auto height = matrix.GetHeight();
+				auto summary = new int[height];
+
+				for (int i = 0; i < height; ++i) {
+					summary[i] = 0;
+
+					matrix.ForeachH(i, [&](int value) {
+						summary[i] += value;
+					});
+				}
+
+				for (int i = 0; i < height; ++i) {
+					matrix.Set(0, i, summary[i]);
+				}
+
+				matrix.Print();
 			}
 			break;
 

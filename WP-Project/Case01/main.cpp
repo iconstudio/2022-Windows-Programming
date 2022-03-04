@@ -34,13 +34,25 @@ public:
 		place = value;
 	}
 
+	const int Get(size_t x, size_t y) const {
+		return (matrix[y][x]);
+	}
+
+	const int Get(size_t index) const {
+		size_t r = static_cast<size_t>(index / sz_w);
+		size_t x = (index - r * sz_w);
+		size_t y = r;
+		return Get(x, y);
+	}
+
 	int& At(size_t x, size_t y) const {
 		return (matrix[y][x]);
 	}
 
 	int& At(size_t index) const {
-		size_t x = (index % sz_w);
-		size_t y = (index / sz_w);
+		size_t r = static_cast<size_t>(index / sz_w);
+		size_t x = (index - r * sz_w);
+		size_t y = r;
 		return At(x, y);
 	}
 
@@ -202,25 +214,22 @@ int main() {
 
 			case 'R': // 무작위 재정렬
 			{
-				auto& _UFirst = matrix.At(0);
-				auto& _ULast = matrix.At(matrix.size - 1);
-				auto& _UTarget = matrix.At(0);
-				size_t _Target_index = 1;
+				size_t it_index = 1;
 
-				for (; ++_Target_index < matrix.size - 1; ++_Target_index) {
-					uniform_int_distribution<int> r_distribution(0, _Target_index + 1);
+				for (; it_index < matrix.size - 1; it_index++) {
+					uniform_int_distribution<> x_distribution(0, matrix.sz_w - 1);
+					uniform_int_distribution<> y_distribution(0, matrix.sz_h - 1);
 
-					size_t _Off = r_distribution(r_engine);
-					if (_Off < 0 || _Target_index < _Off) {
-						break;
-					}
+					size_t swap_x = x_distribution(r_engine);
+					size_t swap_y = y_distribution(r_engine);
+					auto swap_value = matrix.Get(swap_x, swap_y);
 
-					if (_Off != _Target_index) {
-						auto value = _UTarget;
-						matrix.Set(_Target_index, value);
-						matrix.Set(_Off, value);
-					}
+					auto value = matrix.Get(it_index);
+					matrix.Set(it_index, swap_value);
+					matrix.Set(swap_x, swap_y, value);
 				}
+
+				matrix.Print();
 			}
 			break;
 

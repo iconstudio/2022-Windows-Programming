@@ -102,11 +102,13 @@ public:
 	void PrintH_If(const size_t y, Predicate predicate) {
 		for (int i = 0; i < sz_w; ++i) {
 			auto& place = At(i, y);
+			auto org = cout.width(2);
 			if (predicate(place)) {
-				auto org = cout.width(2);
 				cout << place << " ";
-				cout.width(org);
+			} else {
+				cout << "00" << " ";
 			}
+			cout.width(org);
 		}
 		cout << '\n';
 	}
@@ -148,22 +150,68 @@ int main() {
 		switch (command) {
 			case 'A': // 행을 따라 오름차순 정렬
 			{
+				vector<int> temp;
+				temp.reserve(matrix.size);
 
+				matrix.Foreach([&](int value) {
+					temp.push_back(value);
+				});
+
+				sort(temp.begin(), temp.end());
+
+				auto it = temp.begin();
+				matrix.Foreach([&](int& place) {
+					place = *(it++);
+				});
+
+				temp.clear();
+				matrix.Print();
 			}
 			break;
 
 			case 'D': // 열을 따라 내림차순 정렬
 			{
+				vector<int> temp;
+				temp.reserve(matrix.size);
+
+				matrix.Foreach([&](int value) {
+					temp.push_back(value);
+				});
+
+				sort(temp.begin(), temp.end());
+
+				auto it = temp.rbegin(); // 뒷부분 부터 순회
+				auto width = matrix.GetWidth();
+				for (int i = width - 1; 0 <= i; --i) { // 가장 큰 값이 가장 오른쪽 위로
+					matrix.ForeachV(i, [&](int& place) {
+						place = *(it++);
+					});
+				}
+
+				temp.clear();
+				matrix.Print();
 			}
 			break;
 
 			case 'E': // 짝수
 			{
+				auto height = matrix.GetHeight();
+				for (int i = 0; i < height; ++i) {
+					matrix.PrintH_If(i, [&](int value) {
+						return (value % 2 == 0);
+					});
+				}
 			}
 			break;
 
 			case 'O': // 홀수
 			{
+				auto height = matrix.GetHeight();
+				for (int i = 0; i < height; ++i) {
+					matrix.PrintH_If(i, [&](int value) {
+						return (value % 2 == 1);
+					});
+				}
 			}
 			break;
 
@@ -217,16 +265,13 @@ int main() {
 				size_t it_index = 1;
 
 				for (; it_index < matrix.size - 1; it_index++) {
-					uniform_int_distribution<> x_distribution(0, matrix.sz_w - 1);
-					uniform_int_distribution<> y_distribution(0, matrix.sz_h - 1);
-
-					size_t swap_x = x_distribution(r_engine);
-					size_t swap_y = y_distribution(r_engine);
-					auto swap_value = matrix.Get(swap_x, swap_y);
+					uniform_int_distribution<> swap_distribution(0, matrix.size - 1);
+					size_t swap_index = swap_distribution(r_engine);
+					auto swap_value = matrix.Get(swap_index);
 
 					auto value = matrix.Get(it_index);
 					matrix.Set(it_index, swap_value);
-					matrix.Set(swap_x, swap_y, value);
+					matrix.Set(swap_index, value);
 				}
 
 				matrix.Print();

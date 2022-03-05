@@ -227,7 +227,7 @@ int main()
 				auto height = matrix.GetHeight();
 				for (int i = 0; i < height; ++i)
 				{
-					matrix.PrintH_If(i, [&](int value) {
+					matrix.PrintH_If(i, [](int value) {
 						return (value % 2 == 0);
 					});
 				}
@@ -239,7 +239,7 @@ int main()
 				auto height = matrix.GetHeight();
 				for (int i = 0; i < height; ++i)
 				{
-					matrix.PrintH_If(i, [&](int value) {
+					matrix.PrintH_If(i, [](int value) {
 						return (value % 2 == 1);
 					});
 				}

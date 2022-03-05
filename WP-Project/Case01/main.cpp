@@ -8,12 +8,15 @@
 
 using namespace std;
 
-class Matrix {
+class Matrix
+{
 public:
 	Matrix(const size_t w, const size_t h, const size_t value = 0)
-		: sz_w(w), sz_h(h), size(w * h)
-		, matrix(new int* [w]) {
-		for (int i = 0; i < w; ++i) {
+		: sz_w(w), sz_h(h), size(w* h)
+		, matrix(new int* [w])
+	{
+		for (int i = 0; i < w; ++i)
+		{
 			matrix[i] = new int[h] {0};
 			//fill(&(matrix[i][0]), &(matrix[i][w]), value);
 		}
@@ -24,32 +27,38 @@ public:
 	size_t GetWidth() const { return sz_w; }
 	size_t GetHeight() const { return sz_w; }
 
-	void Set(size_t x, size_t y, int value) {
+	void Set(size_t x, size_t y, int value)
+	{
 		auto& place = At(x, y);
 		place = value;
 	}
 
-	void Set(size_t index, int value) {
+	void Set(size_t index, int value)
+	{
 		auto& place = At(index);
 		place = value;
 	}
 
-	const int Get(size_t x, size_t y) const {
+	const int Get(size_t x, size_t y) const
+	{
 		return (matrix[y][x]);
 	}
 
-	const int Get(size_t index) const {
+	const int Get(size_t index) const
+	{
 		size_t r = static_cast<size_t>(index / sz_w);
 		size_t x = (index - r * sz_w);
 		size_t y = r;
 		return Get(x, y);
 	}
 
-	int& At(size_t x, size_t y) const {
+	int& At(size_t x, size_t y) const
+	{
 		return (matrix[y][x]);
 	}
 
-	int& At(size_t index) const {
+	int& At(size_t index) const
+	{
 		size_t r = static_cast<size_t>(index / sz_w);
 		size_t x = (index - r * sz_w);
 		size_t y = r;
@@ -57,9 +66,12 @@ public:
 	}
 
 	template <typename Predicate>
-	void Foreach(Predicate predicate) {
-		for (int j = 0; j < sz_h; ++j) {
-			for (int i = 0; i < sz_w; ++i) {
+	void Foreach(Predicate predicate)
+	{
+		for (int j = 0; j < sz_h; ++j)
+		{
+			for (int i = 0; i < sz_w; ++i)
+			{
 				auto& place = At(i, j);
 				predicate(place);
 			}
@@ -67,29 +79,37 @@ public:
 	}
 
 	template <typename Predicate>
-	void ForeachH(const size_t y, Predicate predicate) {
-		for (int i = 0; i < sz_w; ++i) {
+	void ForeachH(const size_t y, Predicate predicate)
+	{
+		for (int i = 0; i < sz_w; ++i)
+		{
 			auto& place = At(i, y);
 			predicate(place);
 		}
 	}
 
 	template <typename Predicate>
-	void ForeachV(const size_t x, Predicate predicate) {
-		for (int j = 0; j < sz_h; ++j) {
+	void ForeachV(const size_t x, Predicate predicate)
+	{
+		for (int j = 0; j < sz_h; ++j)
+		{
 			auto& place = At(x, j);
 			predicate(place);
 		}
 	}
 
-	void Print() {
-		for (int i = 0; i < sz_h; ++i) {
+	void Print()
+	{
+		for (int i = 0; i < sz_h; ++i)
+		{
 			PrintH(i);
 		}
 	}
 
-	void PrintH(const size_t y) {
-		for (int i = 0; i < sz_w; ++i) {
+	void PrintH(const size_t y)
+	{
+		for (int i = 0; i < sz_w; ++i)
+		{
 			auto& place = At(i, y);
 			auto org = cout.width(2);
 			cout << place << " ";
@@ -99,13 +119,18 @@ public:
 	}
 
 	template<typename Predicate>
-	void PrintH_If(const size_t y, Predicate predicate) {
-		for (int i = 0; i < sz_w; ++i) {
+	void PrintH_If(const size_t y, Predicate predicate)
+	{
+		for (int i = 0; i < sz_w; ++i)
+		{
 			auto& place = At(i, y);
 			auto org = cout.width(2);
-			if (predicate(place)) {
+			if (predicate(place))
+			{
 				cout << place << " ";
-			} else {
+			}
+			else
+			{
 				cout << "00" << " ";
 			}
 			cout.width(org);
@@ -117,7 +142,8 @@ public:
 	int** matrix = nullptr;
 };
 
-int main() {
+int main()
+{
 	Matrix matrix{ 5, 4 };
 	char command = 0;
 	bool done = false;
@@ -139,7 +165,8 @@ int main() {
 
 	cin.clear();
 
-	while (true) {
+	while (true)
+	{
 		if (done) break;
 
 		cout << "명령어 입력: ";
@@ -147,7 +174,8 @@ int main() {
 
 		command = toupper(command);
 
-		switch (command) {
+		switch (command)
+		{
 			case 'A': // 행을 따라 오름차순 정렬
 			{
 				vector<int> temp;
@@ -182,7 +210,8 @@ int main() {
 
 				auto it = temp.rbegin(); // 뒷부분 부터 순회
 				auto width = matrix.GetWidth();
-				for (int i = width - 1; 0 <= i; --i) { // 가장 큰 값이 가장 오른쪽 위로
+				for (int i = width - 1; 0 <= i; --i)
+				{ // 가장 큰 값이 가장 오른쪽 위로
 					matrix.ForeachV(i, [&](int& place) {
 						place = *(it++);
 					});
@@ -196,7 +225,8 @@ int main() {
 			case 'E': // 짝수
 			{
 				auto height = matrix.GetHeight();
-				for (int i = 0; i < height; ++i) {
+				for (int i = 0; i < height; ++i)
+				{
 					matrix.PrintH_If(i, [&](int value) {
 						return (value % 2 == 0);
 					});
@@ -207,7 +237,8 @@ int main() {
 			case 'O': // 홀수
 			{
 				auto height = matrix.GetHeight();
-				for (int i = 0; i < height; ++i) {
+				for (int i = 0; i < height; ++i)
+				{
 					matrix.PrintH_If(i, [&](int value) {
 						return (value % 2 == 1);
 					});
@@ -219,7 +250,8 @@ int main() {
 			{
 				auto max = numeric_limits<int>::min();
 				matrix.Foreach([&](int value) {
-					if (max < value) {
+					if (max < value)
+					{
 						max = value;
 					}
 				});
@@ -231,7 +263,8 @@ int main() {
 			{
 				int min = numeric_limits<int>::max();
 				matrix.Foreach([&](int value) {
-					if (value < min) {
+					if (value < min)
+					{
 						min = value;
 					}
 				});
@@ -244,7 +277,8 @@ int main() {
 				auto height = matrix.GetHeight();
 				auto summary = new int[height];
 
-				for (int i = 0; i < height; ++i) {
+				for (int i = 0; i < height; ++i)
+				{
 					summary[i] = 0;
 
 					matrix.ForeachH(i, [&](int value) {
@@ -252,7 +286,8 @@ int main() {
 					});
 				}
 
-				for (int i = 0; i < height; ++i) {
+				for (int i = 0; i < height; ++i)
+				{
 					matrix.Set(0, i, summary[i]);
 				}
 
@@ -264,7 +299,8 @@ int main() {
 			{
 				size_t it_index = 1;
 
-				for (; it_index < matrix.size - 1; it_index++) {
+				for (; it_index < matrix.size - 1; it_index++)
+				{
 					uniform_int_distribution<> swap_distribution(0, matrix.size - 1);
 					size_t swap_index = swap_distribution(r_engine);
 					auto swap_value = matrix.Get(swap_index);

@@ -5,14 +5,17 @@
 
 using namespace std;
 
-bool IsLowerCase(char ch) {
+bool IsLowerCase(char ch)
+{
 	return (97 <= ch && ch <= 122);
 }
-bool IsUpperCase(char ch) {
+bool IsUpperCase(char ch)
+{
 	return (65 <= ch && ch <= 90);
 }
 
-int main() {
+int main()
+{
 	string inputs;
 	char command = 0;
 	bool done = false;
@@ -27,15 +30,20 @@ int main() {
 	const auto last = end(inputs);
 	auto it = find(begin(inputs), last, ' ');
 
-	if (last != it) {
-		while (true) {
+	if (last != it)
+	{
+		while (true)
+		{
 			it = adjacent_find(it, last, [](char lhs, char rhs) {
 				return (lhs == ' ' && lhs == rhs);
 			});
 
-			if (last == it) {
+			if (last == it)
+			{
 				break;
-			} else {
+			}
+			else
+			{
 				inputs.erase(it);
 			}
 		}
@@ -48,16 +56,19 @@ int main() {
 	const auto blk_last = end(blank_modifier);
 	bool blk_did = false;
 
-	while (true) {
+	while (true)
+	{
 		if (done) break;
 
 		cout << "명령어 입력: ";
 		cin >> command;
-		if (IsLowerCase(command)) {
+		if (IsLowerCase(command))
+		{
 			command -= 32;
 		}
 
-		switch (command) {
+		switch (command)
+		{
 			case 'L':
 			{
 				auto result = count(inputs.begin(), inputs.end(), ' ');
@@ -68,9 +79,12 @@ int main() {
 			case 'C':
 			{
 				for_each(inputs.begin(), inputs.end(), [&](char& value) {
-					if (IsLowerCase(value)) {
+					if (IsLowerCase(value))
+					{
 						value -= 32;
-					} else if (IsUpperCase(value)) {
+					}
+					else if (IsUpperCase(value))
+					{
 						value += 32;
 					}
 				});
@@ -87,12 +101,15 @@ int main() {
 				string result, temp;
 				auto temp_inserter = back_insert_iterator(temp);
 
-				for (it = inputs.begin(); it != end; ++it) {
+				for (it = inputs.begin(); it != end; ++it)
+				{
 					const auto ch = (*it);
 
-					if (' ' == ch) {
-						// 출력
-						if (check_e) {
+					if (' ' == ch)
+					{
+		// 출력
+						if (check_e)
+						{
 							transform(temp.begin(), temp.end()
 								, temp.begin(), toupper);
 						}
@@ -101,14 +118,18 @@ int main() {
 						result += ' ';
 						temp.clear();
 						check_e = false;
-					} else {
+					}
+					else
+					{
 						temp_inserter = ch;
-						if ('e' == ch || 'E' == ch) {
+						if ('e' == ch || 'E' == ch)
+						{
 							check_e = true;
 						}
 					}
 				}
-				if (check_e) {
+				if (check_e)
+				{
 					transform(temp.begin(), temp.end()
 						, temp.begin(), toupper);
 				}
@@ -122,19 +143,24 @@ int main() {
 			break;
 			case 'F':
 			{
-				if (blk_did) {
+				if (blk_did)
+				{
 					for_each(inputs.begin(), inputs.end(), [&](char& value) {
 						for_each(begin(blank_modifier), blk_last, [&](char org) {
-							if (org == value) {
+							if (org == value)
+							{
 								value = ' ';
 							}
 						});
 					});
 
 					blk_did = false;
-				} else {
+				}
+				else
+				{
 					for_each(inputs.begin(), inputs.end(), [&](char& value) {
-						if (' ' == value) {
+						if (' ' == value)
+						{
 							auto index = r_distribution(r_engine);
 							auto print = blank_modifier[index];
 

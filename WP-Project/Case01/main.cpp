@@ -138,6 +138,18 @@ public:
 		cout << '\n';
 	}
 
+	void Reset(default_random_engine& engine)
+	{
+		array<int, 50> numbers;
+		iota(numbers.begin(), numbers.end(), 1);
+		shuffle(numbers.begin(), numbers.end(), engine);
+
+		int index = 0;
+		for_each_n(numbers.begin(), size, [&](int number) {
+			Set(index++, number);
+		});
+	}
+
 	const size_t sz_w, sz_h, size;
 	int** matrix = nullptr;
 };
@@ -151,15 +163,7 @@ int main()
 	random_device r_device;
 	default_random_engine r_engine(r_device());
 
-	array<int, 50> numbers;
-	iota(numbers.begin(), numbers.end(), 1);
-	shuffle(numbers.begin(), numbers.end(), r_engine);
-
-	int index = 0;
-	for_each_n(numbers.begin(), matrix.size, [&](int number) {
-		matrix.Set(index++, number);
-	});
-
+	matrix.Reset(r_engine);
 	matrix.Print();
 	cout << endl;
 
@@ -316,6 +320,8 @@ int main()
 
 			case 'S': // 다시 값 입력받기 시작
 			{
+				matrix.Reset(r_engine);
+				matrix.Print();
 			}
 			break;
 
@@ -324,7 +330,6 @@ int main()
 				done = true;
 			}
 			break;
-
 		}
 	}
 }
